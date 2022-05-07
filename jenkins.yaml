@@ -2,17 +2,16 @@
 #  deprecation: warn
 
 jenkins:
-  systemMessage: "Playing with Jenkins Configuration as Code (JCasC) Deployed to GKE and Minikube. "
+  systemMessage: "权限申请发邮件到 zhijun.zhai@midea.com"
   agentProtocols:
     - "JNLP4-connect"
     - "Ping"
   securityRealm:
-    github:
-      clientID: "${clientID}"
-      clientSecret: "${clientSecret}"
-      githubApiUri: "https://api.github.com"
-      githubWebUri: "https://github.com"
-      oauthScopes: "read:org,user:email"
+    local:
+      allowsSignup: false,
+      users: 
+        - id: admin
+          password: admin
   authorizationStrategy:
     globalMatrix:
       grantedPermissions:
@@ -29,11 +28,8 @@ jenkins:
   primaryView:
     all:
       name: "all"
-  quietPeriod: 5
-  scmCheckoutRetryCount: 0
-
-jobs:
-  - url: https://raw.githubusercontent.com/Praqma/job-dsl-collection/master/configuration-as-code-dsl/pipeline.dsl #casc
+  quietPeriod: 60
+  scmCheckoutRetryCount: 100
 
 tool:
   git:
@@ -46,68 +42,68 @@ security:
     enabled: false
 
 unclassified:
-  simple-theme-plugin:
-    elements:
-    - cssUrl:
-        url: "https://cdn.rawgit.com/afonsof/jenkins-material-theme/gh-pages/dist/material-purple.css"
+#   simple-theme-plugin:
+#     elements:
+#     - cssUrl:
+#         url: "https://cdn.rawgit.com/afonsof/jenkins-material-theme/gh-pages/dist/material-purple.css"
   location:
     url: https://jenkins.praqma.cloud
     adminAddress: support@praqma.net
-  warnings:
-    parsers:
-      - name: "LinkChecker CSV (Jekyll flavor)"
-        linkName: "Jekyll LinkChecker"
-        trendName: "LinkChecker CSV (Jekyll flavor)"
-        regexp: "([^\\n;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^\\n]*)"
-        script: |
-          import hudson.plugins.analysis.util.model.Priority
-          import hudson.plugins.warnings.parser.Warning
+#   warnings:
+#     parsers:
+#       - name: "LinkChecker CSV (Jekyll flavor)"
+#         linkName: "Jekyll LinkChecker"
+#         trendName: "LinkChecker CSV (Jekyll flavor)"
+#         regexp: "([^\\n;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^;]*?(?=;))?;([^\\n]*)"
+#         script: |
+#           import hudson.plugins.analysis.util.model.Priority
+#           import hudson.plugins.warnings.parser.Warning
 
-          def obj = [
-                  url          : matcher.group(1),
-                  parentUrl    : matcher.group(2),
-                  baseRef      : matcher.group(3),
-                  result       : matcher.group(4),
-                  warningString: matcher.group(5),
-                  infoString   : matcher.group(6),
-                  valid        : matcher.group(7),
-                  fullUrl      : matcher.group(8),
-                  line         : matcher.group(9),
-                  column       : matcher.group(10),
-                  name         : matcher.group(11),
-                  dlTime       : matcher.group(12),
-                  dlSize       : matcher.group(13),
-                  checkTime    : matcher.group(14),
-                  cached       : matcher.group(15),
-                  level        : matcher.group(16),
-                  modified     : matcher.group(17)
-          ]
+#           def obj = [
+#                   url          : matcher.group(1),
+#                   parentUrl    : matcher.group(2),
+#                   baseRef      : matcher.group(3),
+#                   result       : matcher.group(4),
+#                   warningString: matcher.group(5),
+#                   infoString   : matcher.group(6),
+#                   valid        : matcher.group(7),
+#                   fullUrl      : matcher.group(8),
+#                   line         : matcher.group(9),
+#                   column       : matcher.group(10),
+#                   name         : matcher.group(11),
+#                   dlTime       : matcher.group(12),
+#                   dlSize       : matcher.group(13),
+#                   checkTime    : matcher.group(14),
+#                   cached       : matcher.group(15),
+#                   level        : matcher.group(16),
+#                   modified     : matcher.group(17)
+#           ]
 
-          String jekyllTarget = "_site"
-          String defaultIndex = "index.html"
-          String source = obj.parentUrl
+#           String jekyllTarget = "_site"
+#           String defaultIndex = "index.html"
+#           String source = obj.parentUrl
 
-          def line = obj.line.toInteger()
-          def type = obj.level
-          def category = obj.result
+#           def line = obj.line.toInteger()
+#           def type = obj.level
+#           def category = obj.result
 
-          message = "$obj.fullUrl: ($obj.result) $obj.warningString - $obj.infoString"
+#           message = "$obj.fullUrl: ($obj.result) $obj.warningString - $obj.infoString"
 
-          def priority = null
-          if ( category.equalsIgnoreCase("ignored"))
-             if (obj.warningString != null && obj.warningString != "" ){
-                priority = Priority.HIGH
-                category = "warning"
-             }  else
-                priority = Priority.LOW
-          else
-             priority = Priority.NORMAL
+#           def priority = null
+#           if ( category.equalsIgnoreCase("ignored"))
+#              if (obj.warningString != null && obj.warningString != "" ){
+#                 priority = Priority.HIGH
+#                 category = "warning"
+#              }  else
+#                 priority = Priority.LOW
+#           else
+#              priority = Priority.NORMAL
 
-          if (obj.valid.equalsIgnoreCase("false"))
-              priority = Priority.HIGH
+#           if (obj.valid.equalsIgnoreCase("false"))
+#               priority = Priority.HIGH
 
-          return new Warning(source, line, type, category, message, priority)
-        example: ""
+#           return new Warning(source, line, type, category, message, priority)
+#         example: ""
   globalLibraries:
     libraries:
       - name: "praqma-shared@master"
@@ -118,15 +114,64 @@ unclassified:
             scm:
               git:
                 remote: "https://github.com/Praqma/shared-pipeline.git"
-plugins:
-  required:
-    simple-theme-plugin: 0.5.1
-    configuration-as-code-support
-#    git: 3.9.0
-#    ssh-slaves: 1.26
-#    warnings: 4.66
-#    matrix-auth: 2.2
-#    job-dsl: 1.68
-#    workflow-aggregator: 2.5
-#    timestamper: 1.8.9
+# plugins:
+#   required:
+#     simple-theme-plugin: 0.5.1
+#     configuration-as-code-support
+# #    git: 3.9.0
+# #    ssh-slaves: 1.26
+# #    warnings: 4.66
+# #    matrix-auth: 2.2
+# #    job-dsl: 1.68
+# #    workflow-aggregator: 2.5
+# #    timestamper: 1.8.9
+jobs:
+- "script": |
+    folder('project-a') {
+        description('project-a')
+    }
+- "script": |
+    folder('project-b') {
+        description('project-b')
+    }
+- "script": |
+    folder('project-b/testing') {
+        description('project-b/testing')
+    }
+- "script": |
+    pipelineJob('bazel-jsonnet-grafana-demo') {
+        definition {
+          cpsScm {
+            scriptPath("Jenkinsfile.groovy")
+            scm {
+              git {
+                remote {
+                  credentials('credentialid')
+                  url('https://github.com/zacker330/bazel-jsonnet-grafana-demo.git')
+                }
+                branches('*/master','*/feat.*','*/hotfix.*','*/release.*')
+              }
+            }
+            lightweight()
+          }
+        }
+    }
 
+- "script": |
+    pipelineJob('project-b/testing/abc') {
+        definition {
+          cpsScm {
+            scriptPath("Jenkinsfile.groovy")
+            scm {
+              git {
+                remote {
+                  credentials('credentialid')
+                  url('https://github.com/zacker330/abc.git')
+                }
+                branches('*/master','*/feat.*','*/hotfix.*','*/release.*')
+              }
+            }
+            lightweight()
+          }
+        }
+    }

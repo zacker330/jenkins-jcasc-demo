@@ -2,8 +2,8 @@ version: '3.3'
 
 services:
   jenkins: 
-    #build: #TODO: Once plugin installation is handled through c-as-c this can be removed and replaced with 'image'.
-      #context: ./master
+    # build: #TODO: Once plugin installation is handled through c-as-c this can be removed and replaced with 'image'.
+    #   context: ./master
     image: sharepointoscar/jcasc:v5
     ports: 
       - 8080:8080
